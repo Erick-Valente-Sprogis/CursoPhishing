@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Segurança Digital — Cursinho</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0c0c0c;
+    --surface: #141414;
+    --surface2: #1c1c1c;
+    --border: #242424;
+    --text: #f0ede8;
+    --muted: #666;
+    --muted2: #999;
+    --accent: #4f8ef7;
+    --green: #00e676;
+    --red: #ff5252;
+    --yellow: #ffd60a;
+    --orange: #ff9500;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── TOP PROGRESS BAR ── */
+  .progress-bar-wrap {
+    width: 100%;
+    height: 3px;
+    background: var(--border);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--green));
+    transition: width 0.5s ease;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: fixed;
+    top: 3px;
+    left: 0; right: 0;
+    z-index: 90;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 28px;
+    background: rgba(12,12,12,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .header-brand {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--accent);
+  }
+  .header-step {
+    font-size: 13px;
+    color: var(--muted2);
+  }
+  .header-step b { color: var(--text); }
+
+  /* ── MODULE DOTS ── */
+  .dots-nav {
+    display: flex;
+    gap: 8px;
+  }
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+    border: 1px solid var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .dot.done { background: var(--accent); border-color: var(--accent); }
+  .dot.active { background: var(--green); border-color: var(--green); transform: scale(1.4); }
+
+  /* ── MAIN ── */
+  main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 100px 20px 120px;
+    min-height: 100vh;
+  }
+
+  /* ── SLIDE ── */
+  .slide {
+    display: none;
+    width: 100%;
+    max-width: 680px;
+    animation: slide-in 0.45s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  }
+  .slide.active { display: flex; flex-direction: column; gap: 28px; }
+  @keyframes slide-in {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Module badge */
+  .mod-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted2);
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    width: fit-content;
+  }
+  .mod-badge .num {
+    background: var(--accent);
+    color: #000;
+    font-size: 10px;
+    font-weight: 800;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .slide-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(26px, 5vw, 42px);
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--text);
+  }
+  .slide-title em { font-style: normal; color: var(--accent); }
+
+  .slide-body {
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 1.75;
+    color: #aaa;
+  }
+  .slide-body b { color: var(--text); font-weight: 500; }
+  .slide-body strong { color: var(--accent); font-weight: 600; }
+
+  /* Content cards */
+  .cards {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .info-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    transition: border-color 0.2s;
+  }
+  .info-card:hover { border-color: #333; }
+  .card-icon {
+    font-size: 26px;
+    flex-shrink: 0;
+    line-height: 1;
+    margin-top: 2px;
+  }
+  .card-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 5px; }
+  .card-desc { font-size: 14px; color: #888; line-height: 1.6; }
+
+  /* Highlight box */
+  .highlight {
+    border-radius: 12px;
+    padding: 20px 24px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #bbb;
+  }
+  .highlight.blue  { background: rgba(79,142,247,0.08); border: 1px solid rgba(79,142,247,0.2); }
+  .highlight.red   { background: rgba(255,82,82,0.07);  border: 1px solid rgba(255,82,82,0.2); }
+  .highlight.green { background: rgba(0,230,118,0.07);  border: 1px solid rgba(0,230,118,0.2); }
+  .highlight.yellow{ background: rgba(255,214,10,0.07); border: 1px solid rgba(255,214,10,0.2); }
+  .highlight .hl-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .highlight.blue  .hl-title { color: var(--accent); }
+  .highlight.red   .hl-title { color: var(--red); }
+  .highlight.green .hl-title { color: var(--green); }
+  .highlight.yellow .hl-title { color: var(--yellow); }
+
+  /* Checklist */
+  .checklist { display: flex; flex-direction: column; gap: 10px; }
+  .check-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #aaa;
+    padding: 14px 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  .check-item .check-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .check-item b { color: var(--text); font-weight: 500; display: block; }
+
+  /* Two-col grid */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 500px) { .grid2 { grid-template-columns: 1fr; } }
+  .mini-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+  }
+  .mini-card .mc-icon { font-size: 28px; margin-bottom: 10px; display: block; }
+  .mini-card .mc-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .mini-card .mc-desc { font-size: 13px; color: #777; line-height: 1.5; }
+
+  /* Final slide */
+  .final-wrap {
+    text-align: center;
+    padding: 20px 0;
+  }
+  .trophy { font-size: 80px; display: block; margin-bottom: 24px; animation: pop 0.7s cubic-bezier(0.34,1.56,0.64,1) both; }
+  @keyframes pop {
+    from { opacity: 0; transform: scale(0.4); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  .final-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(28px, 6vw, 44px);
+    font-weight: 800;
+    color: var(--green);
+    margin-bottom: 14px;
+    text-shadow: 0 0 40px rgba(0,230,118,0.3);
+  }
+  .final-sub {
+    font-size: 16px;
+    font-weight: 300;
+    color: #888;
+    line-height: 1.7;
+    max-width: 440px;
+    margin: 0 auto 36px;
+  }
+  .final-sub b { color: var(--text); font-weight: 500; }
+  .takeaways {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    text-align: left;
+    margin-bottom: 32px;
+  }
+  .takeaways-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted2);
+    margin-bottom: 16px;
+  }
+  .takeaway-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    color: #aaa;
+    line-height: 1.6;
+  }
+  .takeaway-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .takeaway-row span { color: var(--green); font-size: 16px; flex-shrink: 0; }
+
+  /* ── BOTTOM NAV ── */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 90;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 28px;
+    background: rgba(12,12,12,0.95);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid var(--border);
+    gap: 12px;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    border-radius: 100px;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--muted2);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { color: var(--text); border-color: #444; }
+  .btn-ghost:disabled { opacity: 0.3; cursor: default; }
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn-primary:hover { background: #6ba3ff; transform: translateY(-1px); }
+  .btn-finish {
+    background: var(--green);
+    color: #000;
+  }
+  .btn-finish:hover { background: #33ffaa; transform: translateY(-1px); }
+</style>
+</head>
+<body>
+
+<!-- PROGRESS BAR -->
+<div class="progress-bar-wrap">
+  <div class="progress-bar-fill" id="progressFill" style="width:20%"></div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-brand">🔒 Segurança Digital</div>
+  <div class="dots-nav" id="dotsNav">
+    <div class="dot active" onclick="goTo(0)"></div>
+    <div class="dot" onclick="goTo(1)"></div>
+    <div class="dot" onclick="goTo(2)"></div>
+    <div class="dot" onclick="goTo(3)"></div>
+    <div class="dot" onclick="goTo(4)"></div>
+  </div>
+  <div class="header-step">Módulo <b id="stepLabel">1</b> de 5</div>
+</header>
+
+<!-- SLIDES -->
+<main>
+
+  <!-- ═══════════ MÓDULO 1 ═══════════ -->
+  <div class="slide active" id="slide-0">
+    <div class="mod-badge"><span class="num">1</span> O que é phishing</div>
+    <h2 class="slide-title">Você foi pescado.<br><em>Como isso funciona?</em></h2>
+    <p class="slide-body">
+      <b>Phishing</b> é uma técnica de golpe onde criminosos <b>se passam por pessoas ou empresas confiáveis</b>
+      para roubar seus dados. O nome vem do inglês <em>"fishing"</em> — pescar — porque a lógica é a mesma:
+      jogam uma isca e esperam a vítima morder.
+    </p>
+    <div class="cards">
+      <div class="info-card">
+        <div class="card-icon">📧</div>
+        <div>
+          <div class="card-title">Como chega até você?</div>
+          <div class="card-desc">E-mail falso, SMS, WhatsApp, ligação telefônica ou site clonado. Qualquer canal pode ser usado.</div>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="card-icon">🎭</div>
+        <div>
+          <div class="card-title">Quem eles fingem ser?</div>
+          <div class="card-desc">Bancos, Receita Federal, Correios, iFood, operadoras de celular, lojas online, até amigos e familiares.</div>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="card-icon">🎯</div>
+        <div>
+          <div class="card-title">O que querem?</div>
+          <div class="card-desc">Senha bancária, CPF, número de cartão, código de verificação, acesso a contas de redes sociais.</div>
+        </div>
+      </div>
+    </div>
+    <div class="highlight blue">
+      <div class="hl-title">💡 Por que é tão eficaz?</div>
+      Golpes de phishing <b>exploram emoções</b>: medo de perder a conta, ganância de uma promoção, urgência de uma entrega.
+      Quando você está com medo ou empolgado, pensa menos criticamente.
+    </div>
+  </div>
+
+  <!-- ═══════════ MÓDULO 2 ═══════════ -->
+  <div class="slide" id="slide-1">
+    <div class="mod-badge"><span class="num">2</span> Como identificar</div>
+    <h2 class="slide-title"><em>Os sinais</em> que<br>entregam o golpe</h2>
+    <p class="slide-body">
+      Golpes bem feitos podem enganar qualquer pessoa. Mas quase todos deixam <b>pistas visíveis</b>
+      se você souber o que procurar. Treine seu olhar para esses sinais:
+    </p>
+    <div class="checklist">
+      <div class="check-item">
+        <span class="check-icon">🌐</span>
+        <div><b>Remetente com domínio estranho</b> Verifique o endereço completo do e-mail. <code style="font-size:12px;background:rgba(255,82,82,0.1);color:#ff5252;padding:2px 7px;border-radius:4px;border:1px solid rgba(255,82,82,0.2)">@banco-urgente-suporte.com</code> não é o banco.</div>
+      </div>
+      <div class="check-item">
+        <span class="check-icon">⏰</span>
+        <div><b>Urgência e ameaças</b> "Sua conta será bloqueada em 24h" é uma técnica de pressão. Empresas sérias não operam assim.</div>
+      </div>
+      <div class="check-item">
+        <span class="check-icon">👤</span>
+        <div><b>Sem seu nome</b> "Prezado cliente" em vez do seu nome completo. Seu banco já sabe quem você é.</div>
+      </div>
+      <div class="check-item">
+        <span class="check-icon">🔗</span>
+        <div><b>Link suspeito</b> Passe o mouse no link sem clicar. O endereço de destino aparece no canto da tela. Confere?</div>
+      </div>
+      <div class="check-item">
+        <span class="check-icon">✏️</span>
+        <div><b>Erros de português</b> Bancos e órgãos sérios revisam seus textos. Erros de digitação e frases estranhas são sinal de alerta.</div>
+      </div>
+      <div class="check-item">
+        <span class="check-icon">🎁</span>
+        <div><b>Promessas boas demais</b> "Você ganhou R$ 1.200 de cashback!" Se você não participou de nada, desconfie sempre.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ MÓDULO 3 ═══════════ -->
+  <div class="slide" id="slide-2">
+    <div class="mod-badge"><span class="num">3</span> Tipos de golpe</div>
+    <h2 class="slide-title">Os golpes mais<br><em>comuns no Brasil</em></h2>
+    <p class="slide-body">
+      O Brasil é um dos países com <b>maior índice de golpes digitais</b> do mundo.
+      Conheça os formatos mais frequentes para não ser pego de surpresa:
+    </p>
+    <div class="grid2">
+      <div class="mini-card">
+        <span class="mc-icon">🏦</span>
+        <div class="mc-title">Golpe Bancário</div>
+        <div class="mc-desc">E-mail ou SMS fingindo ser seu banco, pedindo para "regularizar" sua conta clicando em um link.</div>
+      </div>
+      <div class="mini-card">
+        <span class="mc-icon">📦</span>
+        <div class="mc-title">Falsa Entrega</div>
+        <div class="mc-desc">"Seu pacote está retido. Pague R$9,90 de taxa." Link leva para página que rouba dados do cartão.</div>
+      </div>
+      <div class="mini-card">
+        <span class="mc-icon">💸</span>
+        <div class="mc-title">Golpe do PIX</div>
+        <div class="mc-desc">"Você recebeu um Pix mas precisa confirmar seus dados." Ou QR codes falsos trocados na hora do pagamento.</div>
+      </div>
+      <div class="mini-card">
+        <span class="mc-icon">📱</span>
+        <div class="mc-title">Clonagem de WhatsApp</div>
+        <div class="mc-desc">Pedem o código de verificação fingindo ser suporte. Com o código, assumem sua conta e pedem dinheiro a seus contatos.</div>
+      </div>
+      <div class="mini-card">
+        <span class="mc-icon">🛒</span>
+        <div class="mc-title">Loja Falsa</div>
+        <div class="mc-desc">Sites clonados de lojas conhecidas com preços absurdos. Após o pagamento, o produto nunca chega.</div>
+      </div>
+      <div class="mini-card">
+        <span class="mc-icon">📋</span>
+        <div class="mc-title">Imposto e Receita</div>
+        <div class="mc-desc">"Sua declaração tem irregularidades." E-mails falsos da Receita Federal para roubar CPF e dados bancários.</div>
+      </div>
+    </div>
+    <div class="highlight yellow">
+      <div class="hl-title">⚠️ Atenção especial</div>
+      Golpistas usam <b>dados reais</b> sobre você (nome, CPF, endereço) obtidos em vazamentos para tornar a abordagem mais convincente.
+      Desconfie mesmo quando "souberem" seus dados.
+    </div>
+  </div>
+
+  <!-- ═══════════ MÓDULO 4 ═══════════ -->
+  <div class="slide" id="slide-3">
+    <div class="mod-badge"><span class="num">4</span> O que fazer</div>
+    <h2 class="slide-title">Caiu no golpe?<br><em>Aja agora.</em></h2>
+    <p class="slide-body">
+      Se você inseriu dados em um site falso ou respondeu a um golpe, <b>cada minuto conta.</b>
+      Siga estes passos imediatamente:
+    </p>
+    <div class="cards">
+      <div class="info-card">
+        <div class="card-icon">🔐</div>
+        <div>
+          <div class="card-title">1. Troque suas senhas agora</div>
+          <div class="card-desc">Comece pelo e-mail principal, depois o banco, depois redes sociais. Use senhas únicas em cada serviço.</div>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="card-icon">🏦</div>
+        <div>
+          <div class="card-title">2. Ligue para o banco</div>
+          <div class="card-desc">Informe sobre o ocorrido. Peça para bloquear cartões, monitorar movimentações suspeitas e ativar alertas.</div>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="card-icon">📵</div>
+        <div>
+          <div class="card-title">3. Revogue acessos</div>
+          <div class="card-desc">No WhatsApp: Configurações → Aparelhos conectados → desconecte tudo. Em apps de banco: encerre todas as sessões ativas.</div>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="card-icon">🚔</div>
+        <div>
+          <div class="card-title">4. Registre um B.O.</div>
+          <div class="card-desc">Acesse delegaciaeletronica.pc.sp.gov.br (ou o site da delegacia do seu estado). O registro é online, rápido e necessário para acionar seguros.</div>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="card-icon">📢</div>
+        <div>
+          <div class="card-title">5. Avise seus contatos</div>
+          <div class="card-desc">Se sua conta de WhatsApp ou e-mail foi comprometida, avise a todos que mensagens suspeitas podem ter sido enviadas em seu nome.</div>
+        </div>
+      </div>
+    </div>
+    <div class="highlight red">
+      <div class="hl-title">🚨 Nunca faça isso</div>
+      Nunca pague nada para "recuperar" acesso a uma conta. Nunca forneça código de autenticação por telefone — nem para quem diz ser do banco.
+      <b>Banco não pede código, nunca.</b>
+    </div>
+  </div>
+
+  <!-- ═══════════ MÓDULO 5 ═══════════ -->
+  <div class="slide" id="slide-4">
+    <div class="mod-badge"><span class="num">5</span> Proteção</div>
+    <h2 class="slide-title">Proteja-se<br><em>antes do golpe.</em></h2>
+    <p class="slide-body">
+      A melhor defesa é o hábito. Pequenas ações do dia a dia tornam você um alvo <b>muito mais difícil.</b>
+    </p>
+    <div class="checklist">
+      <div class="check-item">
+        <span class="check-icon">🔑</span>
+        <div><b>Ative autenticação em dois fatores (2FA)</b> Em todos os apps importantes: banco, e-mail, WhatsApp, Instagram. É a barreira mais eficaz.</div>
+      </div>
+      <div class="check-item">
+        <span class="check-icon">🔒</span>
+        <div><b>Use senhas únicas e longas</b> Uma senha diferente para cada serviço. Um gerenciador de senhas (Bitwarden, por exemplo) facilita muito.</div>
+      </div>
+      <div class="check-item">
+        <span class="check-icon">🔍</span>
+        <div><b>Verifique antes de clicar</b> Na dúvida, abra o site diretamente digitando o endereço no navegador. Não clique em links de e-mail ou SMS.</div>
+      </div>
+      <div class="check-item">
+        <span class="check-icon">🌐</span>
+        <div><b>Confira o HTTPS e o domínio</b> Um cadeado verde não garante segurança. Verifique se o domínio é exatamente o certo: <em>bradesco.com.br</em>, não <em>bradesco-acesso.com</em>.</div>
+      </div>
+      <div class="check-item">
+        <span class="check-icon">📱</span>
+        <div><b>Mantenha apps e sistema atualizados</b> Atualizações corrigem falhas de segurança que golpistas exploram para entrar no seu dispositivo.</div>
+      </div>
+      <div class="check-item">
+        <span class="check-icon">🗣️</span>
+        <div><b>Compartilhe esse conhecimento</b> Idosos e crianças são os alvos mais frequentes. Ensine as pessoas ao seu redor a reconhecer golpes.</div>
+      </div>
+    </div>
+
+    <!-- FINAL SLIDE CONTENT -->
+    <div class="final-wrap" style="margin-top: 16px;">
+      <span class="trophy">🏆</span>
+      <div class="final-title">Cursinho concluído!</div>
+      <p class="final-sub">
+        Você agora conhece os principais golpes digitais e sabe como se defender.
+        <b>Compartilhe esse conhecimento</b> — ele pode proteger alguém que você ama.
+      </p>
+      <div class="takeaways">
+        <div class="takeaways-title">📌 O que você aprendeu</div>
+        <div class="takeaway-row"><span>✓</span> O que é phishing e como funciona a lógica do golpe</div>
+        <div class="takeaway-row"><span>✓</span> Os 6 sinais visuais que entregam um e-mail falso</div>
+        <div class="takeaway-row"><span>✓</span> Os 6 tipos de golpe mais comuns no Brasil</div>
+        <div class="takeaway-row"><span>✓</span> Os 5 passos para agir se você cair num golpe</div>
+        <div class="takeaway-row"><span>✓</span> As 6 proteções que você deve ativar hoje</div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <button class="btn btn-ghost" id="btnPrev" onclick="prev()" disabled>← Anterior</button>
+  <button class="btn btn-primary" id="btnNext" onclick="next()">Próximo →</button>
+</div>
+
+<script>
+  let current = 0;
+  const total = 5;
+
+  function goTo(index) {
+    if (index < 0 || index >= total) return;
+    document.getElementById('slide-' + current).classList.remove('active');
+    current = index;
+    document.getElementById('slide-' + current).classList.add('active');
+    update();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function next() { if (current < total - 1) goTo(current + 1); }
+  function prev() { if (current > 0) goTo(current - 1); }
+
+  function update() {
+    const fill = ((current + 1) / total) * 100;
+    document.getElementById('progressFill').style.width = fill + '%';
+    document.getElementById('stepLabel').textContent = current + 1;
+
+    const dots = document.querySelectorAll('.dot');
+    dots.forEach((d, i) => {
+      d.classList.remove('active', 'done');
+      if (i === current) d.classList.add('active');
+      else if (i < current) d.classList.add('done');
+    });
+
+    const btnPrev = document.getElementById('btnPrev');
+    const btnNext = document.getElementById('btnNext');
+    btnPrev.disabled = current === 0;
+
+    if (current === total - 1) {
+      btnNext.textContent = '✓ Finalizar';
+      btnNext.className = 'btn btn-finish';
+      btnNext.onclick = () => {
+        btnNext.textContent = '🎉 Parabéns!';
+        btnNext.disabled = true;
+      };
+    } else {
+      btnNext.textContent = 'Próximo →';
+      btnNext.className = 'btn btn-primary';
+      btnNext.onclick = next;
+      btnNext.disabled = false;
+    }
+  }
+</script>
+</body>
+</html>
